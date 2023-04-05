@@ -4,7 +4,9 @@ function homeScreen() {
   // Create info
   let info = {
     name: "",
-    conn: null,
+    code: "",
+    conns: [],
+    color: "",
   };
 
   // Set background for home screen
@@ -163,7 +165,7 @@ function homeScreen() {
     gameCodeEntry.style.position = "absolute";
     gameCodeEntry.style.top = "20%";
     gameCodeEntry.style.left = "10%";
-    gameCodeEntry.style.width = "50%";
+    gameCodeEntry.style.width = "45%";
     gameCodeEntry.style.height = "20%";
     gameCodeEntry.style.borderTopLeftRadius = "1em";
     gameCodeEntry.style.borderBottomLeftRadius = "1em";
@@ -180,8 +182,8 @@ function homeScreen() {
     const joinGameButton = document.createElement("button");
     joinGameButton.style.position = "absolute";
     joinGameButton.style.top = "20%";
-    joinGameButton.style.left = "60%";
-    joinGameButton.style.width = "30%";
+    joinGameButton.style.left = "55%";
+    joinGameButton.style.width = "35%";
     joinGameButton.style.height = "20%";
     joinGameButton.style.borderTopRightRadius = "1em";
     joinGameButton.style.borderBottomRightRadius = "1em";
@@ -227,6 +229,26 @@ function homeScreen() {
       }
     });
 
+    // Add join game button click effect only when button is clickable
+    joinGameButton.addEventListener("click", () => {
+      if (codeEntered) {
+        // Set button text
+        joinGameButton.innerHTML = "Joining...";
+
+        // Try to create connection
+        const peer = new Peer();
+
+        peer.on("open", (id) => {
+          const conn = peer.connect(gameCodeEntry.value);
+
+          // Wait for connection to be established
+          conn.on("open", () => {
+            console.log("Connection established.");
+          });
+        });
+      }
+    });
+
     // Add 'or' text
     const orText = document.createElement("h1");
     orText.style.position = "absolute";
@@ -258,9 +280,84 @@ function homeScreen() {
     createGameButton.style.fontFamily = "Racing Sans One";
     createGameButton.innerHTML = "Create Game";
     homePanel.appendChild(createGameButton);
+
+    // Add create game button hover effect
+    createGameButton.addEventListener("mouseover", () => {
+      createGameButton.style.backgroundColor = "white";
+      createGameButton.style.color = "black";
+    });
+    createGameButton.addEventListener("mouseout", () => {
+      createGameButton.style.backgroundColor = "black";
+      createGameButton.style.color = "white";
+    });
+
+    // Add create game button click effect
+    createGameButton.addEventListener("click", () => {
+      // Set button text
+      createGameButton.innerHTML = "Creating...";
+
+      // Try to create connection
+      const peer = new Peer();
+
+      peer.on("open", (id) => {
+        // Save game code and set default color
+        info.code = id;
+        info.color = "yellow";
+
+        createPlayersScreen();
+      });
+    });
   }
 
-  createModeSelectionScreen();
+  function createPlayersScreen() {
+    homePanel.innerHTML = "";
+
+    // Add code copy button
+    const copyCodeButton = document.createElement("button");
+    copyCodeButton.style.position = "absolute";
+    copyCodeButton.style.top = "5%";
+    copyCodeButton.style.left = "25%";
+    copyCodeButton.style.width = "50%";
+    copyCodeButton.style.height = "15%";
+    copyCodeButton.style.backgroundColor = "black";
+    copyCodeButton.style.transition = "all 0.2s";
+    copyCodeButton.style.borderRadius = "1em";
+    copyCodeButton.style.color = "white";
+    copyCodeButton.style.fontSize = "2em";
+    copyCodeButton.style.fontFamily = "Racing Sans One";
+    copyCodeButton.innerHTML = "Copy Code";
+    homePanel.appendChild(copyCodeButton);
+
+    // Add copy code button hover effect
+    copyCodeButton.addEventListener("mouseover", () => {
+      copyCodeButton.style.backgroundColor = "white";
+      copyCodeButton.style.color = "black";
+    });
+    copyCodeButton.addEventListener("mouseout", () => {
+      copyCodeButton.style.backgroundColor = "black";
+      copyCodeButton.style.color = "white";
+    });
+
+    // Add copy code button click effect
+    copyCodeButton.addEventListener("click", () => {
+      // Copy code to clipboard
+      navigator.clipboard.writeText(info.code);
+
+      // Set button text
+      copyCodeButton.innerHTML = "Copied!";
+
+      // Reset button text
+      setTimeout(() => {
+        copyCodeButton.innerHTML = "Copy Code";
+      }, 1000);
+    });
+  }
+
+  // createStartScreen();
+
+  info.code = "asdf";
+  info.color = "yellow";
+  createPlayersScreen();
 }
 
 function main() {
