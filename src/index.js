@@ -1,12 +1,15 @@
 "use strict";
 
+const playerColors = ["yellow", "red", "blue", "green", "orange"];
+
 function homeScreen() {
   // Create info
   let info = {
     name: "",
     code: "",
     conns: [],
-    color: "",
+    number: 0,
+    isHost: false,
   };
 
   // Set background for home screen
@@ -21,10 +24,10 @@ function homeScreen() {
   // Create home panel
   const homePanel = document.createElement("div");
   homePanel.style.position = "absolute";
-  homePanel.style.top = "25%";
-  homePanel.style.left = "calc(50% - 15em)";
-  homePanel.style.width = "30em";
-  homePanel.style.height = "50%";
+  homePanel.style.top = "calc(50% - 14em)";
+  homePanel.style.left = "calc(50% - 16em)";
+  homePanel.style.width = "32em";
+  homePanel.style.height = "28em";
   homePanel.style.backgroundColor = "white";
   homePanel.style.border = "1px solid black";
   homePanel.style.borderRadius = "1em";
@@ -302,7 +305,8 @@ function homeScreen() {
       peer.on("open", (id) => {
         // Save game code and set default color
         info.code = id;
-        info.color = "yellow";
+        info.number = 0;
+        info.isHost = true;
 
         createPlayersScreen();
       });
@@ -351,12 +355,58 @@ function homeScreen() {
         copyCodeButton.innerHTML = "Copy Code";
       }, 1000);
     });
+
+    // Add player list
+    const playerList = [];
+    for (let i = 0; i < 5; i++) {
+      const player = document.createElement("div");
+      player.style.position = "absolute";
+      player.style.top = `calc(25% + ${i * 1.9}em)`;
+      player.style.left = "15%";
+      player.style.width = "70%";
+      player.style.height = "1.5em";
+      player.style.backgroundColor = "white";
+      player.style.color = "black";
+      player.style.border = `0.2em solid ${playerColors[i]}`;
+      player.style.fontSize = "1.5em";
+      player.style.fontFamily = "Racing Sans One";
+      player.innerHTML = `(${i + 1}) Waiting ....`;
+      homePanel.appendChild(player);
+      playerList.push(player);
+    }
+
+    // Add start game button
+    const startGameButton = document.createElement("button");
+    startGameButton.style.position = "absolute";
+    startGameButton.style.top = "80%";
+    startGameButton.style.left = "25%";
+    startGameButton.style.width = "50%";
+    startGameButton.style.height = "15%";
+    startGameButton.style.backgroundColor = info.isHost ? "black" : "grey";
+    startGameButton.style.transition = "all 0.2s";
+    startGameButton.style.borderRadius = "1em";
+    startGameButton.style.color = "white";
+    startGameButton.style.fontSize = "2em";
+    startGameButton.style.fontFamily = "Racing Sans One";
+    startGameButton.innerHTML = "Start Game";
+    homePanel.appendChild(startGameButton);
+
+    // Add start game button hover effect
+    startGameButton.addEventListener("mouseover", () => {
+      if (info.isHost) {
+        startGameButton.style.backgroundColor = "white";
+        startGameButton.style.color = "black";
+      }
+    });
+    startGameButton.addEventListener("mouseout", () => {
+      startGameButton.style.backgroundColor = "black";
+      startGameButton.style.color = "white";
+    });
   }
 
   // createStartScreen();
 
   info.code = "asdf";
-  info.color = "yellow";
   createPlayersScreen();
 }
 
