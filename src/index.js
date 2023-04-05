@@ -367,11 +367,11 @@ function homeScreen() {
       player.style.width = "70%";
       player.style.height = "1.5em";
       player.style.backgroundColor = "white";
-      player.style.color = "black";
+      player.style.color = "gray";
       player.style.border = `0.2em solid ${playerColors[i]}`;
       player.style.fontSize = "1.5em";
       player.style.fontFamily = "Racing Sans One";
-      player.innerHTML = `(${i + 1}) Waiting ...`;
+      player.innerHTML = `(${i + 1}) Waiting...`;
       homePanel.appendChild(player);
       playerList.push(player);
     }
@@ -418,6 +418,7 @@ function homeScreen() {
       playerList[info.number].innerHTML = `(${info.number + 1}) ${
         info.name
       } ⭐`;
+      playerList[info.number].style.color = "black";
 
       info.peer.on("connection", (conn) => {
         // Make sure there is room
@@ -435,6 +436,7 @@ function homeScreen() {
           const number = info.conns.length;
           info.names[number] = data;
           playerList[number].innerHTML = `(${number + 1}) ${data}`;
+          playerList[number].style.color = "black";
 
           // Reply with player number
           conn.send(`you-are ${number}`);
@@ -471,6 +473,7 @@ function homeScreen() {
           playerList[info.number].innerHTML = `(${info.number + 1}) ${
             info.name
           } ⭐`;
+          playerList[info.number].style.color = "black";
         } else if (type === "start-game") {
           // Play noise
           const noise = new Audio("assets/audio/clang.mp3");
@@ -490,6 +493,7 @@ function homeScreen() {
           const name = args[1];
           info.names[number] = name;
           playerList[number].innerHTML = `(${number + 1}) ${name}`;
+          playerList[number].style.color = "black";
         } else {
           console.log(`Unknown data type: ${type}`);
         }
