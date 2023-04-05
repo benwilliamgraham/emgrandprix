@@ -406,9 +406,11 @@ function homeScreen() {
 
     // Add start game button click effect
     startGameButton.addEventListener("click", () => {
-      // Send start game message to all players
-      for (let i = 0; i < info.conns.length; i++) {
-        info.conns[i].send("start-game");
+      if (info.isHost) {
+        // Send start game message to all players
+        for (let i = 0; i < info.conns.length; i++) {
+          info.conns[i].send("start-game");
+        }
       }
     });
 
