@@ -21,6 +21,7 @@ function homeScreen() {
   homeScreenBackground.style.top = "0";
   homeScreenBackground.style.left = "0";
   homeScreenBackground.style.height = "100%";
+  homeScreenBackground.style.width = "100%";
   document.body.appendChild(homeScreenBackground);
 
   // Create home panel
