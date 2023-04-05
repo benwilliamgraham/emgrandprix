@@ -7,7 +7,7 @@
 - The Pope
 - New York Jesus
 - Guitar
-- Jimmy Hoffa
+- Jimmy Neutron/Hoffa
 
 # Maps
 

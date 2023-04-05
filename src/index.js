@@ -7,6 +7,7 @@ function homeScreen() {
   let info = {
     name: "",
     code: "",
+    peer: null,
     conns: [],
     number: 0,
     isHost: false,
@@ -129,11 +130,6 @@ function homeScreen() {
         // Set info
         info.name = nameEntry.value;
 
-        // Set start button click effect
-        startButton.style.backgroundColor = "white";
-        startButton.style.color = "black";
-        startButton.style.transform = "scale(0.9)";
-
         // Have home panel children fade out
         homePanel.childNodes.forEach((child) => {
           child.style.transition = "all 0.2s";
@@ -239,14 +235,16 @@ function homeScreen() {
         joinGameButton.innerHTML = "Joining...";
 
         // Try to create connection
-        const peer = new Peer();
+        info.peer = new Peer();
 
-        peer.on("open", (id) => {
-          const conn = peer.connect(gameCodeEntry.value);
+        info.peer.on("open", (id) => {
+          const conn = info.peer.connect(gameCodeEntry.value);
+
+          info.conns.push(conn);
 
           // Wait for connection to be established
           conn.on("open", () => {
-            console.log("Connection established.");
+            createPlayersScreen();
           });
         });
       }
@@ -300,9 +298,9 @@ function homeScreen() {
       createGameButton.innerHTML = "Creating...";
 
       // Try to create connection
-      const peer = new Peer();
+      info.peer = new Peer();
 
-      peer.on("open", (id) => {
+      info.peer.on("open", (id) => {
         // Save game code and set default color
         info.code = id;
         info.number = 0;
@@ -370,7 +368,7 @@ function homeScreen() {
       player.style.border = `0.2em solid ${playerColors[i]}`;
       player.style.fontSize = "1.5em";
       player.style.fontFamily = "Racing Sans One";
-      player.innerHTML = `(${i + 1}) Waiting ....`;
+      player.innerHTML = `(${i + 1}) Waiting ...`;
       homePanel.appendChild(player);
       playerList.push(player);
     }
@@ -402,12 +400,84 @@ function homeScreen() {
       startGameButton.style.backgroundColor = "black";
       startGameButton.style.color = "white";
     });
+
+    // Add start game button click effect
+    startGameButton.addEventListener("click", () => {
+      // Send start game message to all players
+      for (let i = 0; i < info.conns.length; i++) {
+        info.conns[i].send("start-game");
+      }
+    });
+
+    // Handle connection
+    if (info.isHost) {
+      // Set self
+      playerList[info.number].innerHTML = `(${info.number + 1}) ${
+        info.name
+      } ⭐`;
+
+      info.peer.on("connection", (conn) => {
+        // Save connection
+        info.conns.push(conn);
+
+        // Get player name and reply with the player number
+        conn.on("data", (data) => {
+          // Update player list
+          const number = info.conns.length;
+          playerList[number].innerHTML = `(${number + 1}) ${data}`;
+
+          // Reply with player number
+          conn.send(`you-are ${number}`);
+
+          // Send existing players to new player
+          for (let i = 0; i < info.conns.length - 1; i++) {
+            conn.send(`player-joined ${i} ${playerList[i].innerHTML}`);
+          }
+          conn.send(`player-joined ${number} ${playerList[number].innerHTML}`);
+
+          // Send new player to existing players
+          for (let i = 0; i < info.conns.length - 1; i++) {
+            info.conns[i].send(`player-joined ${number} ${data}`);
+          }
+        });
+      });
+    } else {
+      const hostConn = info.conns[0];
+
+      // Send player name
+      hostConn.send(info.name);
+
+      // Parse server inputs
+      hostConn.on("data", (data) => {
+        // Split data
+        const [type, ...args] = data.split(" ");
+
+        // Handle data
+        if (type === "you-are") {
+          // Save player number
+          info.number = parseInt(args[0]);
+
+          // Update player list
+          playerList[info.number].innerHTML = `(${info.number + 1}) ${
+            info.name
+          } ⭐`;
+        } else if (type === "start-game") {
+          // Play noise
+          const noise = new Audio("assets/audio/clang.mp3");
+          noise.play();
+        } else if (type === "player-joined") {
+          // Update player list
+          const number = parseInt(args[0]);
+          const name = args[1];
+          playerList[number].innerHTML = `(${number + 1}) ${name}`;
+        } else {
+          console.log(`Unknown data type: ${type}`);
+        }
+      });
+    }
   }
 
-  // createStartScreen();
-
-  info.code = "asdf";
-  createPlayersScreen();
+  createStartScreen();
 }
 
 function main() {
