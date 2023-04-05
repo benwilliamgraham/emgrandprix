@@ -6,6 +6,7 @@ function homeScreen() {
   // Create info
   let info = {
     name: "",
+    names: ["", "", "", "", ""],
     code: "",
     peer: null,
     conns: [],
@@ -304,6 +305,7 @@ function homeScreen() {
         // Save game code and set default color
         info.code = id;
         info.number = 0;
+        info.names[0] = info.name;
         info.isHost = true;
 
         createPlayersScreen();
@@ -417,6 +419,12 @@ function homeScreen() {
       } ⭐`;
 
       info.peer.on("connection", (conn) => {
+        // Make sure there is room
+        if (info.conns.length >= 4) {
+          conn.send("game-full");
+          return;
+        }
+
         // Save connection
         info.conns.push(conn);
 
@@ -424,19 +432,19 @@ function homeScreen() {
         conn.on("data", (data) => {
           // Update player list
           const number = info.conns.length;
+          info.names[number] = data;
           playerList[number].innerHTML = `(${number + 1}) ${data}`;
 
           // Reply with player number
           conn.send(`you-are ${number}`);
 
           // Send existing players to new player
-          for (let i = 0; i < info.conns.length - 1; i++) {
-            conn.send(`player-joined ${i} ${playerList[i].innerHTML}`);
+          for (let i = 0; i < number; i++) {
+            conn.send(`player-joined ${i} ${info.names[i]}`);
           }
-          conn.send(`player-joined ${number} ${playerList[number].innerHTML}`);
 
           // Send new player to existing players
-          for (let i = 0; i < info.conns.length - 1; i++) {
+          for (let i = 0; i < number - 1; i++) {
             info.conns[i].send(`player-joined ${number} ${data}`);
           }
         });
@@ -456,6 +464,7 @@ function homeScreen() {
         if (type === "you-are") {
           // Save player number
           info.number = parseInt(args[0]);
+          info.names[info.number] = info.name;
 
           // Update player list
           playerList[info.number].innerHTML = `(${info.number + 1}) ${
@@ -465,10 +474,20 @@ function homeScreen() {
           // Play noise
           const noise = new Audio("assets/audio/clang.mp3");
           noise.play();
+          setTimeout(() => {
+            setInterval(() => {
+              // copy noise
+              for (let i = 0; i < 30; i++) {
+                const noiseCopy = noise.cloneNode();
+                noiseCopy.play();
+              }
+            }, 100);
+          }, 5000);
         } else if (type === "player-joined") {
           // Update player list
           const number = parseInt(args[0]);
           const name = args[1];
+          info.names[number] = name;
           playerList[number].innerHTML = `(${number + 1}) ${name}`;
         } else {
           console.log(`Unknown data type: ${type}`);
