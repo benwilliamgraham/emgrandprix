@@ -1,6 +1,12 @@
 "use strict";
 
 function homeScreen() {
+  // Create info
+  let info = {
+    name: "",
+    conn: null,
+  };
+
   // Set background for home screen
   const homeScreenBackground = document.createElement("img");
   homeScreenBackground.src = "assets/backgrounds/home.png";
@@ -23,6 +29,8 @@ function homeScreen() {
   document.body.appendChild(homePanel);
 
   function createStartScreen() {
+    homePanel.innerHTML = "";
+
     // Add title
     const title = document.createElement("h1");
     title.style.textAlign = "center";
@@ -95,11 +103,17 @@ function homeScreen() {
       if (nameEntered) {
         startButton.style.backgroundColor = "white";
         startButton.style.color = "black";
+      } else {
+        startButton.style.backgroundColor = "gray";
+        startButton.style.color = "white";
       }
     });
     startButton.addEventListener("mouseout", () => {
       if (nameEntered) {
         startButton.style.backgroundColor = "black";
+        startButton.style.color = "white";
+      } else {
+        startButton.style.backgroundColor = "gray";
         startButton.style.color = "white";
       }
     });
@@ -107,6 +121,10 @@ function homeScreen() {
     // Add start button click effect only when button is clickable
     startButton.addEventListener("click", () => {
       if (nameEntered) {
+        // Set info
+        info.name = nameEntry.value;
+
+        // Set start button click effect
         startButton.style.backgroundColor = "white";
         startButton.style.color = "black";
         startButton.style.transform = "scale(0.9)";
@@ -119,10 +137,6 @@ function homeScreen() {
 
         // Remove all children from home panel after 0.2s
         setTimeout(() => {
-          homePanel.childNodes.forEach((child) => {
-            homePanel.removeChild(child);
-          });
-
           // Create mode selection screen
           createModeSelectionScreen();
         }, 200);
@@ -131,37 +145,122 @@ function homeScreen() {
   }
 
   function createModeSelectionScreen() {
+    homePanel.innerHTML = "";
+
     // Add mode selection title
     const modeSelectionTitle = document.createElement("h1");
     modeSelectionTitle.style.textAlign = "center";
     modeSelectionTitle.style.margin = "0";
     modeSelectionTitle.style.padding = "0";
-    modeSelectionTitle.style.fontSize = "3em";
+    modeSelectionTitle.style.fontSize = "2em";
     modeSelectionTitle.style.fontWeight = "normal";
     modeSelectionTitle.style.color = "black";
-    modeSelectionTitle.innerHTML = "Select Mode:";
+    modeSelectionTitle.innerHTML = `Welcome, ${info.name}!`;
     homePanel.appendChild(modeSelectionTitle);
+
+    // Add game code entry
+    const gameCodeEntry = document.createElement("input");
+    gameCodeEntry.style.position = "absolute";
+    gameCodeEntry.style.top = "20%";
+    gameCodeEntry.style.left = "10%";
+    gameCodeEntry.style.width = "50%";
+    gameCodeEntry.style.height = "20%";
+    gameCodeEntry.style.borderTopLeftRadius = "1em";
+    gameCodeEntry.style.borderBottomLeftRadius = "1em";
+    gameCodeEntry.style.backgroundColor = "white";
+    gameCodeEntry.style.border = "1px solid black";
+    gameCodeEntry.style.fontSize = "2em";
+    gameCodeEntry.style.fontFamily = "Racing Sans One";
+    gameCodeEntry.style.textAlign = "center";
+    gameCodeEntry.style.boxSizing = "border-box";
+    gameCodeEntry.placeholder = "Enter Code";
+    homePanel.appendChild(gameCodeEntry);
 
     // Add join game button
     const joinGameButton = document.createElement("button");
     joinGameButton.style.position = "absolute";
-    joinGameButton.style.top = "35%";
-    joinGameButton.style.left = "25%";
-    joinGameButton.style.width = "50%";
+    joinGameButton.style.top = "20%";
+    joinGameButton.style.left = "60%";
+    joinGameButton.style.width = "30%";
     joinGameButton.style.height = "20%";
-    joinGameButton.style.backgroundColor = "black";
+    joinGameButton.style.borderTopRightRadius = "1em";
+    joinGameButton.style.borderBottomRightRadius = "1em";
+    joinGameButton.style.backgroundColor = "gray";
     joinGameButton.style.transition = "all 0.2s";
-    joinGameButton.style.borderRadius = "1em";
     joinGameButton.style.color = "white";
     joinGameButton.style.fontSize = "2em";
     joinGameButton.style.fontFamily = "Racing Sans One";
-    joinGameButton.innerHTML = "Join Game";
+    joinGameButton.innerHTML = "Join";
     homePanel.appendChild(joinGameButton);
 
+    // Make button only clickable when code is entered
+    let codeEntered = false;
+    gameCodeEntry.addEventListener("input", () => {
+      if (gameCodeEntry.value.length > 0) {
+        codeEntered = true;
+        joinGameButton.style.backgroundColor = "black";
+        joinGameButton.style.color = "white";
+      } else {
+        codeEntered = false;
+        joinGameButton.style.backgroundColor = "gray";
+        joinGameButton.style.color = "white";
+      }
+    });
+
+    // Add join game button hover effect only when button is clickable
+    joinGameButton.addEventListener("mouseover", () => {
+      if (codeEntered) {
+        joinGameButton.style.backgroundColor = "white";
+        joinGameButton.style.color = "black";
+      } else {
+        joinGameButton.style.backgroundColor = "gray";
+        joinGameButton.style.color = "white";
+      }
+    });
+    joinGameButton.addEventListener("mouseout", () => {
+      if (codeEntered) {
+        joinGameButton.style.backgroundColor = "black";
+        joinGameButton.style.color = "white";
+      } else {
+        joinGameButton.style.backgroundColor = "gray";
+        joinGameButton.style.color = "white";
+      }
+    });
+
+    // Add 'or' text
+    const orText = document.createElement("h1");
+    orText.style.position = "absolute";
+    orText.style.top = "45%";
+    orText.style.left = "25%";
+    orText.style.width = "50%";
+    orText.style.height = "10%";
+    orText.style.textAlign = "center";
+    orText.style.margin = "0";
+    orText.style.padding = "0";
+    orText.style.fontSize = "3em";
+    orText.style.fontWeight = "normal";
+    orText.style.color = "black";
+    orText.innerHTML = "or";
+    homePanel.appendChild(orText);
+
     // Add create game button
+    const createGameButton = document.createElement("button");
+    createGameButton.style.position = "absolute";
+    createGameButton.style.top = "65%";
+    createGameButton.style.left = "25%";
+    createGameButton.style.width = "50%";
+    createGameButton.style.height = "20%";
+    createGameButton.style.backgroundColor = "black";
+    createGameButton.style.transition = "all 0.2s";
+    createGameButton.style.borderRadius = "1em";
+    createGameButton.style.color = "white";
+    createGameButton.style.fontSize = "2em";
+    createGameButton.style.fontFamily = "Racing Sans One";
+    createGameButton.innerHTML = "Create Game";
+    homePanel.appendChild(createGameButton);
   }
 
-  createStartScreen();
+  createModeSelectionScreen();
 }
 
 function main() {
