@@ -8,6 +8,7 @@
 - New York Jesus
 - Guitar
 - Jimmy Neutron/Hoffa
+- Jagdeep
 
 # Maps
 
@@ -17,3 +18,5 @@
 - Lee Harvey Oswald
 - Clang
 - Clock
+- 3D Glasses
+- Unicycle mode
